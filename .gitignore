@@ -144,3 +144,10 @@ cython_debug/
 # IDE files
 .code/
 .idea/
+
+# Static and media files
+/backend/static/
+/backend/media/
+
+# Logs
+/backend/logs/
