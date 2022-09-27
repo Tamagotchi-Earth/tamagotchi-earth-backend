@@ -190,3 +190,23 @@ if DEBUG:
 # dj-rest-auth settings
 REST_USE_JWT = True
 REST_AUTH_TOKEN_MODEL = None
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'apps.users.serializers.CustomUserDetailsSerializer'
+}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'apps.users.serializers.CustomRegisterSerializer'
+}
+
+# allauth settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_UNIQUE_EMAIL = True
+
+
+# OpenAPI settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Tamagotchi earth backend API',
+    'VERSION': '1.0.0',
+    'SCHEMA_PATH_PREFIX': '/api',
+    'COMPONENT_SPLIT_REQUEST': True  # To fix JWT token serializers
+}

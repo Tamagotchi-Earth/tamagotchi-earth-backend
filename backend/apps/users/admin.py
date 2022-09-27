@@ -9,16 +9,17 @@ from .models import CustomUser
 @admin.register(CustomUser)
 class CustomUserAdmin(BaseUserAdmin):
     fieldsets = (
-        ("Данные для авторизации", {'fields': (
+        ("Authentication", {'fields': (
             'username',
             'email',
             'password',
             'is_active',
-            'is_staff'
+            'is_staff',
+            'is_superuser'
         )}),
-        ("Личные данные", {'fields': (
+        ("Personal data", {'fields': (
             'name',
-            'avatar',
+            'avatar'
         )}),
     )
     list_display = ('username', 'email', 'name')
