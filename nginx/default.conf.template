@@ -28,3 +28,13 @@ server {
     }
 
 }
+
+server {
+    listen 80 default_server;
+    server_name _;
+
+    # Denies all connections from other hostnames
+    location / {
+        return 403;
+    }
+}
