@@ -46,3 +46,5 @@ services:
 
 volumes:
   db_data:
+  backend_media:
+  backend_static:
