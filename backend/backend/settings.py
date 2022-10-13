@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -6,9 +7,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-15blib&w2rj4=wuhv*@p#05)307b@!uoan98=9da7q&3s9&fup'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', default='*').split(" ")
+if '*' not in ALLOWED_HOSTS and (_domain_name := os.environ.get('NGINX_DOMAIN_NAME')) is not None:
+    ALLOWED_HOSTS.append(_domain_name)
 
 # Application definition
 DJANGO_APPS = [
@@ -67,15 +70,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# List of availible databases for project (sqlite for development, postgres for deployment inside Docker)
+AVAILIBLE_DATABASES = {
+    'sqlite': {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    },
+    'postgres': {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'db',
+            'PORT': 5432
+        }
     }
 }
 
+# Selected database
+DATABASES = AVAILIBLE_DATABASES[os.environ.get('DJANGO_DB_TYPE', 'sqlite')]
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = []
@@ -96,27 +112,22 @@ if not DEBUG:
         },
     ]
 
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'api/static/'
 STATIC_ROOT = BASE_DIR / 'static'
-
 
 # Media files
 MEDIA_URL = 'api/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Logging configuration
 LOG_DIRECTORY = BASE_DIR / 'logs'
@@ -165,10 +176,8 @@ LOGGING = {
     }
 }
 
-
 # Custom user model
 AUTH_USER_MODEL = 'users.CustomUser'
-
 
 # Django REST Framework settings
 REST_FRAMEWORK = {
@@ -186,7 +195,6 @@ if DEBUG:
         'rest_framework.authentication.BasicAuthentication'
     ]
 
-
 # dj-rest-auth settings
 REST_USE_JWT = True
 REST_AUTH_TOKEN_MODEL = None
@@ -201,7 +209,6 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_UNIQUE_EMAIL = True
-
 
 # OpenAPI settings
 SPECTACULAR_SETTINGS = {
