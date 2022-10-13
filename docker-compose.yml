@@ -20,6 +20,10 @@ services:
       - DJANGO_DEBUG
       - DJANGO_ALLOWED_HOSTS
       - NGINX_DOMAIN_NAME
+    volumes:
+      - "./logs/backend:/var/www/backend/logs"
+      - "backend_media:/var/www/backend/media"
+      - "backend_static:/var/www/backend/static"
     depends_on:
       - db
     restart: unless-stopped
@@ -31,6 +35,9 @@ services:
       - NGINX_DOMAIN_NAME
     volumes:
       - "./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro"
+      - "./logs/nginx:/var/log/nginx"
+      - "backend_media:/var/www/backend/media:ro"
+      - "backend_static:/var/www/backend/static:ro"
     ports:
       - "${NGINX_HTTP_PORT}:80"
     depends_on:

@@ -151,3 +151,4 @@ cython_debug/
 
 # Logs
 /backend/logs/
+/logs/
