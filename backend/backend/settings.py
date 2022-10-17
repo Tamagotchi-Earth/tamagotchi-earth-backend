@@ -31,14 +31,16 @@ EXTERNAL_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'drf_spectacular',
-    'rest_framework'
+    'rest_framework',
+    'modeltranslation'
 ]
 
 INTERNAL_APPS = [
+    'apps.products',
     'apps.users'
 ]
 
-INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
+INSTALLED_APPS = EXTERNAL_APPS + DJANGO_APPS + INTERNAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -217,3 +219,9 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': '/api',
     'COMPONENT_SPLIT_REQUEST': True  # To fix JWT token serializers
 }
+
+# Modeltranslation settings
+LANGUAGES = [
+    ('en', "English"),
+    ('ru', "Russian")
+]
