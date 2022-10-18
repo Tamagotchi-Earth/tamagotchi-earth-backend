@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from common.models import ModelBase
 from common.utils import UUIDFilenameGenerator
+from apps.users.models import CustomUser
 from .enums import ProductTypes
 
 
@@ -25,3 +26,17 @@ class Product(ModelBase):
 
     def __str__(self):
         return str(self.name)
+
+
+class UserProductInfo(ModelBase):
+    """Custom information about product for user (override default portion size)"""
+
+    class Meta:
+        verbose_name = "user product info"
+        verbose_name_plural = "user product info"
+        constraints = [models.UniqueConstraint(fields=['product', 'user'], name='unique_product_user')]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='user_info', verbose_name="product")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="user")
+    default_portion_size_override = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True,
+                                                      verbose_name="default user portion size")
