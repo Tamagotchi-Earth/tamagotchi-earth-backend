@@ -20,7 +20,7 @@ class Product(ModelBase):
                              verbose_name="icon")
     is_green = models.BooleanField(verbose_name="is green")
     type = models.CharField(max_length=8, choices=ProductTypes.choices, verbose_name="product type")
-    hint = models.CharField(max_length=255, blank=False, verbose_name="hint")
+    hint = models.CharField(max_length=255, blank=True, verbose_name="hint")
     default_portion_size = models.FloatField(validators=[MinValueValidator(0)], blank=True, null=True,
                                              verbose_name="default user portion size")
 
