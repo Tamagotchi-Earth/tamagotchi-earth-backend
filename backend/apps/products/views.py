@@ -19,6 +19,7 @@ class ProductViewSet(ReadOnlyModelViewSet):
     @extend_schema(request=UserProductInfoSerializer)
     @action(detail=True, methods=['patch'], url_path='set_user_info')
     def set_user_info(self, request, *args, **kwargs):
+        """Set fields exclusive to current user"""
         product = self.get_object()
         serializer = UserProductInfoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

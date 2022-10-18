@@ -5,4 +5,6 @@ from .models import Product
 
 @admin.register(Product)
 class ProductAdmin(TranslationAdmin):
-    pass
+    list_display = ('name', 'type', 'icon')
+    list_filter = ('type',)
+    search_fields = ('name',)
