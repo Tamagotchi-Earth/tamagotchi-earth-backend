@@ -1,6 +1,6 @@
 from typing import Optional
 from rest_framework import serializers
-from .models import Product, UserProductInfo
+from .models import Product, UserProductInfo, UserProductConsumption
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -16,6 +16,10 @@ class ProductSerializer(serializers.ModelSerializer):
             'type',
             'hint',
             'default_portion_size',
+            'ghg',
+            'land',
+            'water',
+            'footprint_per_unit',
             'default_portion_size_override'
         )
         read_only_fields = (
@@ -25,10 +29,14 @@ class ProductSerializer(serializers.ModelSerializer):
             'is_green',
             'type',
             'hint',
+            'ghg',
+            'land',
+            'water',
+            'footprint_per_unit',
             'default_portion_size'
         )
 
-    # This solution is hacky but it works
+    footprint_per_unit = serializers.FloatField(read_only=True)
     default_portion_size_override = serializers.SerializerMethodField()
 
     def get_default_portion_size_override(self, obj) -> Optional[float]:
@@ -40,18 +48,6 @@ class ProductSerializer(serializers.ModelSerializer):
         except UserProductInfo.DoesNotExist:
             return None
 
-    # def update(self, instance, validated_data):
-    #     if '_default_portion_size_override' in validated_data:
-    #         default_portion_size_override = validated_data.get('_default_portion_size_override')
-    #         request = self.context['request']
-    #         user_info_obj, created = instance.user_info.get_or_create(user_id=request.user.id, defaults={
-    #             'default_portion_size_override': default_portion_size_override
-    #         })
-    #         if not created:
-    #             user_info_obj.default_portion_size_override = default_portion_size_override
-    #             user_info_obj.save()
-    #     return super(ProductSerializer, self).update(instance, validated_data)
-
 
 class UserProductInfoSerializer(serializers.ModelSerializer):
     """Serializer for UserProductInfo model"""
@@ -61,3 +57,29 @@ class UserProductInfoSerializer(serializers.ModelSerializer):
         fields = (
             'default_portion_size_override',
         )
+
+
+class UserProductConsumptionSerializer(serializers.ModelSerializer):
+    """Serializer for UserProductConsumption model"""
+
+    class Meta:
+        model = UserProductConsumption
+        fields = (
+            'id',
+            'product',
+            'product_id',
+            'portion_size',
+            'date',
+            'user',
+            'footprint'
+        )
+        read_only_fields = (
+            'id',
+            'product',
+            'footprint'
+        )
+
+    product = ProductSerializer(read_only=True)
+    product_id = serializers.PrimaryKeyRelatedField(source='product', queryset=Product.objects.all(), write_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    footprint = serializers.FloatField(read_only=True)

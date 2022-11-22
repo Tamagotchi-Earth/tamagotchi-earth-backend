@@ -1,10 +1,11 @@
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from drf_spectacular.utils import extend_schema
-from .models import Product, UserProductInfo
-from .serializers import ProductSerializer, UserProductInfoSerializer
+from .models import Product, UserProductInfo, UserProductConsumption
+from .serializers import ProductSerializer, UserProductInfoSerializer, UserProductConsumptionSerializer
+from common.pagination import CustomPageNumberPagination
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -26,3 +27,12 @@ class ProductViewSet(ReadOnlyModelViewSet):
         UserProductInfo.objects.update_or_create(product_id=product.id, user_id=request.user.id,
                                                  defaults=serializer.validated_data)
         return Response(self.get_serializer(product).data)
+
+
+class UserProductConsumptionViewSet(ModelViewSet):
+    """List of products consumed by current user"""
+    serializer_class = UserProductConsumptionSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        return UserProductConsumption.objects.filter(user_id=self.request.user.id).order_by('-date')

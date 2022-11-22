@@ -74,8 +74,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# List of availible databases for project (sqlite for development, postgres for deployment inside Docker)
-AVAILIBLE_DATABASES = {
+# List of available databases for project (sqlite for development, postgres for deployment inside Docker)
+AVAILABLE_DATABASES = {
     'sqlite': {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -95,7 +95,7 @@ AVAILIBLE_DATABASES = {
 }
 
 # Selected database
-DATABASES = AVAILIBLE_DATABASES[os.environ.get('DJANGO_DB_TYPE', 'sqlite')]
+DATABASES = AVAILABLE_DATABASES[os.environ.get('DJANGO_DB_TYPE', 'sqlite')]
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = []
