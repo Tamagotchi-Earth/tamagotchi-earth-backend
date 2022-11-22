@@ -14,7 +14,23 @@ class PersonalStatsView(APIView):
         user_id = self.request.user.id
         qs = UserProductConsumption.objects.filter(user_id=user_id)
         consumed_count = qs.count()
-        footprint_list, ghg_list, land_list, water_list = zip(*[
+        if not consumed_count:
+            return Response(PersonalStatsResponseSerializer({
+                'products_consumed': 0,
+                'unique_products_consumed': 0,
+                'most_popular_product': None,
+                'total_footprint': 0,
+                'average_footprint': 0,
+                'total_ghg': 0,
+                'average_ghg': 0,
+                'total_land': 0,
+                'average_land': 0,
+                'total_water': 0,
+                'average_water': 0,
+            }, context={'request': self.request}).data)
+        product_id = qs.values('product').annotate(count=Count('product')).order_by('-count').first()['product']
+        most_popular = Product.objects.get(id=product_id)
+        footprint_list, ghg_list, land_list, water_list = zip(*([
             (
                 obj.product.footprint_per_unit * obj.portion_size,
                 obj.product.ghg * obj.portion_size,
@@ -22,12 +38,7 @@ class PersonalStatsView(APIView):
                 obj.product.water * obj.portion_size
             )
             for obj in qs
-        ])
-        if consumed_count:
-            product_id = qs.values('product').annotate(count=Count('product')).order_by('-count').first()['product']
-            most_popular = Product.objects.get(id=product_id)
-        else:
-            most_popular = None
+        ]))
         return Response(PersonalStatsResponseSerializer({
             'products_consumed': consumed_count,
             'unique_products_consumed': len(set(qs.values_list('product_id', flat=True))),
@@ -41,4 +52,3 @@ class PersonalStatsView(APIView):
             'total_water': sum(water_list),
             'average_water': sum(water_list) / consumed_count,
         }, context={'request': self.request}).data)
-
