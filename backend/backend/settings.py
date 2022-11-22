@@ -37,6 +37,7 @@ EXTERNAL_APPS = [
 
 INTERNAL_APPS = [
     'apps.products',
+    'apps.stats',
     'apps.users'
 ]
 
